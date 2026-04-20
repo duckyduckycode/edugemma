@@ -1,0 +1,23 @@
+{
+  "total_examples": 500,
+  "topics": {
+    "cs": 29,
+    "physics": 88,
+    "calculus": 94,
+    "geometry": 63,
+    "algebra": 108,
+    "chemistry": 47,
+    "biology": 29,
+    "statistics": 18,
+    "probability": 13,
+    "linear_algebra": 11
+  },
+  "difficulty_distribution": {
+    "1": 88,
+    "2": 276,
+    "3": 86,
+    "4": 38,
+    "5": 12
+  },
+  "status": "READY for fine-tuning"
+}

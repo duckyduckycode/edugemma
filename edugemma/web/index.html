@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGemma — Offline AI STEM Tutor</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#30d158">
+    <style>
+        :root {
+            --primary: #30d158;
+            --bg: #0a0a0a;
+            --surface: #1c1c1e;
+            --surface2: #2c2c2e;
+            --text: #f5f5f7;
+            --text2: #98989d;
+            --accent: #0a84ff;
+            --danger: #ff453a;
+            --warning: #ff9f0a;
+            --radius: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--surface);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--surface2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .logo { font-size: 24px; }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header .subtitle { font-size: 12px; color: var(--text2); }
+        .status-badge {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-online { background: rgba(48,209,88,0.2); color: var(--primary); }
+        .status-offline { background: rgba(255,69,58,0.2); color: var(--danger); }
+        .main { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; }
+        .tabs {
+            display: flex;
+            background: var(--surface);
+            padding: 4px;
+            gap: 4px;
+            border-bottom: 1px solid var(--surface2);
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--accent); color: white; }
+        .tab:hover:not(.active) { background: var(--surface2); }
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user {
+            align-self: flex-end;
+            background: var(--accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.assistant {
+            align-self: flex-start;
+            background: var(--surface);
+            border-bottom-left-radius: 4px;
+        }
+        .message code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        .message pre {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--surface2);
+            font-size: 12px;
+            color: var(--text2);
+        }
+        .difficulty-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .difficulty-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--surface2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .difficulty-dot.active { background: var(--primary); color: white; }
+        .difficulty-dot:hover:not(.active) { background: var(--surface2); opacity: 0.8; }
+        .input-area {
+            background: var(--surface);
+            padding: 12px 16px;
+            border-top: 1px solid var(--surface2);
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .input-row { display: flex; gap: 8px; align-items: flex-end; }
+        textarea {
+            flex: 1;
+            background: var(--surface2);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            outline: none;
+        }
+        textarea:focus { box-shadow: 0 0 0 2px var(--accent); }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-ghost { background: var(--surface2); color: var(--text); }
+        .btn-ghost:hover { background: var(--surface2); opacity: 0.8; }
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .quiz-panel { padding: 20px; }
+        .quiz-question {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .quiz-question h3 { font-size: 16px; margin-bottom: 16px; }
+        .quiz-option {
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .quiz-option:hover { background: var(--accent); opacity: 0.8; }
+        .quiz-option.selected { background: var(--accent); }
+        .quiz-option.correct { background: var(--primary); }
+        .quiz-option.wrong { background: var(--danger); }
+        .progress-panel { padding: 20px; }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .stat-card h3 { font-size: 14px; color: var(--text2); margin-bottom: 8px; }
+        .stat-card .value { font-size: 32px; font-weight: 700; }
+        .stat-card .unit { font-size: 14px; color: var(--text2); }
+        .welcome {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text2);
+        }
+        .welcome .emoji { font-size: 48px; margin-bottom: 16px; }
+        .welcome h2 { color: var(--text); font-size: 20px; margin-bottom: 8px; }
+        .welcome p { font-size: 14px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .suggestion {
+            padding: 8px 14px;
+            background: var(--surface2);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggestion:hover { background: var(--accent); color: white; }
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 14px 18px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border-bottom-left-radius: 4px;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text2);
+            margin: 0 2px;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        .image-preview {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🎓</div>
+        <div>
+            <h1>EduGemma</h1>
+            <div class="subtitle">Offline AI STEM Tutor</div>
+        </div>
+        <div id="statusBadge" class="status-badge status-offline">Offline</div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="chat" onclick="switchTab('chat')">💬 Chat</div>
+        <div class="tab" data-tab="quiz" onclick="switchTab('quiz')">🧪 Quiz</div>
+        <div class="tab" data-tab="progress" onclick="switchTab('progress')">📊 Progress</div>
+    </div>
+
+    <div class="difficulty-selector">
+        <span>Level:</span>
+        <div class="difficulty-dots">
+            <div class="difficulty-dot" data-level="1" onclick="setDifficulty(1)">1</div>
+            <div class="difficulty-dot" data-level="2" onclick="setDifficulty(2)">2</div>
+            <div class="difficulty-dot active" data-level="3" onclick="setDifficulty(3)">3</div>
+            <div class="difficulty-dot" data-level="4" onclick="setDifficulty(4)">4</div>
+            <div class="difficulty-dot" data-level="5" onclick="setDifficulty(5)">5</div>
+        </div>
+        <span id="diffLabel" style="margin-left:8px;">Intermediate</span>
+    </div>
+
+    <div class="main">
+        <!-- Chat Tab -->
+        <div id="chatTab" class="chat-area">
+            <div class="welcome">
+                <div class="emoji">🧑‍🎓</div>
+                <h2>Welcome to EduGemma!</h2>
+                <p>I'm your offline STEM tutor powered by Gemma 4. Ask me anything about math, physics, chemistry, or engineering — I'll guide you step by step.</p>
+                <div class="suggestions">
+                    <div class="suggestion" onclick="askSuggestion(this)">How do I solve 2x + 5 = 13?</div>
+                    <div class="suggestion" onclick="askSuggestion(this)">Explain Newton's Third Law</div>
+                    <div class="suggestion" onclick="askSuggestion(this)">What is a mole in chemistry?</div>
+                    <div class="suggestion" onclick="askSuggestion(this)">How does integration work?</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quizTab" class="quiz-panel hidden">
+            <div style="text-align:center; padding: 40px 20px; color: var(--text2);">
+                <div style="font-size: 48px; margin-bottom: 16px;">🧪</div>
+                <h2 style="color: var(--text); margin-bottom: 8px;">Adaptive Quiz</h2>
+                <p style="margin-bottom: 20px;">Test your knowledge! Questions adapt to your level.</p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;">
+                    <button class="btn btn-ghost" onclick="startQuiz('algebra')">Algebra</button>
+                    <button class="btn btn-ghost" onclick="startQuiz('calculus')">Calculus</button>
+                    <button class="btn btn-ghost" onclick="startQuiz('physics')">Physics</button>
+                    <button class="btn btn-ghost" onclick="startQuiz('chemistry')">Chemistry</button>
+                </div>
+                <div id="quizContent"></div>
+            </div>
+        </div>
+
+        <!-- Progress Tab -->
+        <div id="progressTab" class="progress-panel hidden">
+            <div style="text-align:center; padding: 20px; color: var(--text2);">
+                <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                <h2 style="color: var(--text); margin-bottom: 8px;">Your Progress</h2>
+            </div>
+            <div class="stat-card">
+                <h3>Questions Asked</h3>
+                <span class="value" id="statQuestions">0</span>
+            </div>
+            <div class="stat-card">
+                <h3>Quizzes Completed</h3>
+                <span class="value" id="statQuizzes">0</span>
+            </div>
+            <div class="stat-card">
+                <h3>Current Level</h3>
+                <span class="value" id="statLevel">3</span>
+                <span class="unit">/ 5</span>
+            </div>
+            <div class="stat-card">
+                <h3>Topics Explored</h3>
+                <span class="value" id="statTopics">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImage(this)">
+        <button class="btn btn-icon btn-ghost" onclick="document.getElementById('imageInput').click()" title="Upload image">📷</button>
+        <div class="input-wrapper">
+            <div id="imagePreview" class="hidden" style="position:relative;">
+                <img id="previewImg" class="image-preview">
+                <button onclick="clearImage()" style="position:absolute;top:-8px;right:-8px;background:var(--danger);color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;">✕</button>
+            </div>
+            <div class="input-row">
+                <textarea id="chatInput" placeholder="Ask me anything about STEM..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+                <button class="btn btn-primary btn-icon" id="sendBtn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let currentDifficulty = 3;
+        let chatHistory = [];
+        let stats = { questions: 0, quizzes: 0, topics: new Set() };
+
+        const diffLabels = {1:'Beginner', 2:'Elementary', 3:'Intermediate', 4:'Advanced', 5:'Expert'};
+
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            document.querySelectorAll('.difficulty-dot').forEach(d => {
+                d.classList.toggle('active', parseInt(d.dataset.level) <= level);
+            });
+            document.getElementById('diffLabel').textContent = diffLabels[level];
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            document.getElementById('chatTab').classList.toggle('hidden', tab !== 'chat');
+            document.getElementById('quizTab').classList.toggle('hidden', tab !== 'quiz');
+            document.getElementById('progressTab').classList.toggle('hidden', tab !== 'progress');
+            if (tab === 'progress') updateProgress();
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function askSuggestion(el) {
+            document.getElementById('chatInput').value = el.textContent;
+            sendMessage();
+        }
+
+        function handleImage(input) {
+            if (input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Remove welcome
+            const welcome = document.querySelector('.welcome');
+            if (welcome) welcome.remove();
+
+            // Add user message
+            addMessage('user', message);
+            chatHistory.push({ role: 'user', content: message });
+            input.value = '';
+            input.style.height = 'auto';
+            clearImage();
+
+            // Show typing
+            const typing = document.createElement('div');
+            typing.className = 'typing-indicator';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+            document.getElementById('chatTab').appendChild(typing);
+            scrollChat();
+
+            try {
+                if (!backendOnline) throw new Error('Backend offline');
+                const res = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        difficulty: currentDifficulty,
+                        session_id: 1
+                    })
+                });
+                const data = await res.json();
+                typing.remove();
+                addMessage('assistant', data.reply);
+                chatHistory.push({ role: 'assistant', content: data.reply });
+            } catch (err) {
+                // Demo mode - show pre-crafted responses
+                await new Promise(r => setTimeout(r, 800 + Math.random() * 1200)); // Simulate thinking
+                typing.remove();
+                const reply = getDemoResponse(message);
+                addMessage('assistant', reply);
+                chatHistory.push({ role: 'assistant', content: reply });
+            }
+            stats.questions++;
+            detectTopic(message);
+        }
+
+        function addMessage(role, content) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.textContent = content;
+            document.getElementById('chatTab').appendChild(div);
+            scrollChat();
+        }
+
+        function scrollChat() {
+            const chat = document.getElementById('chatTab');
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function detectTopic(msg) {
+            const topics = ['algebra', 'calculus', 'physics', 'chemistry', 'geometry', 'biology', 'engineering'];
+            const lower = msg.toLowerCase();
+            topics.forEach(t => { if (lower.includes(t)) stats.topics.add(t); });
+        }
+
+        async function startQuiz(topic) {
+            const content = document.getElementById('quizContent');
+            content.innerHTML = '<p>Generating quiz...</p>';
+
+            try {
+                const res = await fetch(`${API_URL}/api/quiz`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, num_questions: 3, difficulty: currentDifficulty })
+                });
+                const data = await res.json();
+                stats.quizzes++;
+                renderQuiz(data.questions);
+            } catch (err) {
+                content.innerHTML = '<p>⚠️ Could not generate quiz. Make sure the backend is running.</p>';
+            }
+        }
+
+        function renderQuiz(questions) {
+            const content = document.getElementById('quizContent');
+            content.innerHTML = '';
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-question';
+                div.innerHTML = `<h3>Q${i+1}: ${q.question || q.raw || 'Question'}</h3>`;
+                if (q.options) {
+                    q.options.forEach(opt => {
+                        const btn = document.createElement('div');
+                        btn.className = 'quiz-option';
+                        btn.textContent = opt;
+                        btn.onclick = () => selectAnswer(btn, opt, q.answer, div);
+                        div.appendChild(btn);
+                    });
+                } else {
+                    div.innerHTML += `<p style="color:var(--text2)">${q.raw || 'Raw response from model'}</p>`;
+                }
+                content.appendChild(div);
+            });
+        }
+
+        function selectAnswer(btn, selected, correct, container) {
+            container.querySelectorAll('.quiz-option').forEach(o => {
+                o.style.pointerEvents = 'none';
+                if (o.textContent.startsWith(correct)) o.classList.add('correct');
+            });
+            if (!selected.startsWith(correct)) btn.classList.add('wrong');
+        }
+
+        function updateProgress() {
+            document.getElementById('statQuestions').textContent = stats.questions;
+            document.getElementById('statQuizzes').textContent = stats.quizzes;
+            document.getElementById('statLevel').textContent = currentDifficulty;
+            document.getElementById('statTopics').textContent = stats.topics.size;
+        }
+
+        // Demo mode responses (when backend is offline)
+        const DEMO_RESPONSES = {
+            'algebra': "Let's work through this step by step!\n\nWe have a linear equation. The goal is to isolate the variable x.\n\nStep 1: Subtract the constant from both sides.\nStep 2: Divide both sides by the coefficient of x.\nStep 3: Check your answer by plugging it back in.\n\nThe key insight is that whatever you do to one side, you must do to the other. This keeps the equation balanced.",
+            'calculus': "Great question! Let me break this down.\n\nThe derivative measures how fast something is changing at any point. Think of it like a speedometer — it tells you your speed (rate of change) at a specific moment.\n\nFor power functions like x^n, the rule is simple:\n• Bring down the exponent: n\n• Reduce the exponent by 1: n-1\n• Result: n * x^(n-1)\n\nThis works for any real number n, not just integers!",
+            'physics': "Let's think about this physically first, then do the math.\n\nNewton's laws are really about one thing: forces cause changes in motion.\n\n1st Law: Things keep doing what they're doing unless something pushes them.\n2nd Law: The harder you push (F), the faster it speeds up (a), but heavier things (m) are harder to push. F = ma.\n3rd Law: Every push has an equal push back.\n\nThe 3rd law is why rockets work — they push gas downward, and the gas pushes the rocket upward.",
+            'chemistry': "Here's the key concept:\n\nA mole is just a counting unit, like 'dozen' means 12.\n\n• 1 dozen eggs = 12 eggs\n• 1 mole of atoms = 6.022 × 10²³ atoms\n\nThe number 6.022 × 10²³ is called Avogadro's number. Why this specific number? Because if you have exactly 6.022 × 10²³ carbon-12 atoms, they weigh exactly 12 grams. That's the definition!\n\nSo: molar mass (g/mol) = mass of 1 mole = mass of 6.022 × 10²³ particles."
+        };
+
+        function getDemoResponse(message) {
+            const lower = message.toLowerCase();
+            if (lower.includes('derivative') || lower.includes('integral') || lower.includes('calculus') || lower.includes('integration')) return DEMO_RESPONSES.calculus;
+            if (lower.includes('newton') || lower.includes('force') || lower.includes('velocity') || lower.includes('acceleration')) return DEMO_RESPONSES.physics;
+            if (lower.includes('mole') || lower.includes('bond') || lower.includes('atom') || lower.includes('element') || lower.includes('reaction')) return DEMO_RESPONSES.chemistry;
+            if (lower.includes('solve') || lower.includes('equation') || lower.includes('algebra') || lower.includes('x =')) return DEMO_RESPONSES.algebra;
+            // Generic
+            return "That's a great question! Let me think about this step by step.\n\nIn STEM, we always start by identifying what we know and what we need to find. Then we choose the right tools (formulas, principles) to connect the two.\n\nCould you tell me more about what specific part you'd like help with? I can adjust my explanation to your level.";
+        }
+
+        // Check backend health
+        let backendOnline = false;
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_URL}/health`);
+                const data = await res.json();
+                const badge = document.getElementById('statusBadge');
+                if (data.gemma_available) {
+                    badge.textContent = 'Online';
+                    badge.className = 'status-badge status-online';
+                    backendOnline = true;
+                } else {
+                    badge.textContent = 'Demo';
+                    badge.className = 'status-badge status-offline';
+                    backendOnline = false;
+                }
+            } catch {
+                document.getElementById('statusBadge').textContent = 'Demo';
+                document.getElementById('statusBadge').className = 'status-badge status-offline';
+                backendOnline = false;
+            }
+        }
+
+        checkHealth();
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html>
