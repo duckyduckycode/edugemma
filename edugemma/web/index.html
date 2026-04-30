@@ -9,15 +9,21 @@
     <style>
         :root {
             --primary: #30d158;
+            --primary-dim: rgba(48,209,88,0.15);
             --bg: #0a0a0a;
             --surface: #1c1c1e;
             --surface2: #2c2c2e;
+            --surface3: #3a3a3c;
             --text: #f5f5f7;
             --text2: #98989d;
+            --text3: #636366;
             --accent: #0a84ff;
+            --accent2: #5e5ce6;
             --danger: #ff453a;
             --warning: #ff9f0a;
+            --success: #30d158;
             --radius: 16px;
+            --radius-sm: 10px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -30,18 +36,74 @@
         }
         .header {
             background: var(--surface);
-            padding: 16px 20px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             border-bottom: 1px solid var(--surface2);
             position: sticky;
             top: 0;
             z-index: 10;
         }
-        .logo { font-size: 24px; }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .header .subtitle { font-size: 12px; color: var(--text2); }
+        .logo { font-size: 22px; }
+        .header-text h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+        .header-text .subtitle { font-size: 11px; color: var(--text2); margin-top: 1px; }
+
+        /* ── Offline banner ── */
+        .offline-banner {
+            background: linear-gradient(135deg, rgba(255,69,58,0.12) 0%, rgba(255,159,10,0.08) 100%);
+            border-bottom: 1px solid rgba(255,69,58,0.2);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text2);
+            transition: all 0.4s ease;
+        }
+        .offline-banner.online {
+            background: linear-gradient(135deg, rgba(48,209,88,0.12) 0%, rgba(10,132,255,0.08) 100%);
+            border-bottom-color: rgba(48,209,88,0.2);
+        }
+        .offline-banner .pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .offline-banner:not(.online) .pulse-dot {
+            background: var(--warning);
+            animation: pulse-warn 2s ease-in-out infinite;
+        }
+        .offline-banner.online .pulse-dot {
+            background: var(--success);
+            animation: pulse-ok 2s ease-in-out infinite;
+        }
+        @keyframes pulse-warn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,159,10,0.5); }
+            50% { box-shadow: 0 0 0 6px rgba(255,159,10,0); }
+        }
+        @keyframes pulse-ok {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(48,209,88,0.5); }
+            50% { box-shadow: 0 0 0 6px rgba(48,209,88,0); }
+        }
+        .offline-banner .banner-text { flex: 1; }
+        .offline-banner .banner-text strong { color: var(--text); }
+        .offline-banner .badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .offline-banner:not(.online) .badge {
+            background: rgba(255,159,10,0.2);
+            color: var(--warning);
+        }
+        .offline-banner.online .badge {
+            background: rgba(48,209,88,0.2);
+            color: var(--success);
+        }
+
         .status-badge {
             margin-left: auto;
             padding: 4px 10px;
@@ -50,8 +112,9 @@
             font-weight: 600;
         }
         .status-online { background: rgba(48,209,88,0.2); color: var(--primary); }
-        .status-offline { background: rgba(255,69,58,0.2); color: var(--danger); }
-        .main { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; }
+        .status-offline { background: rgba(255,159,10,0.2); color: var(--warning); }
+
+        .main { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; overflow: hidden; }
         .tabs {
             display: flex;
             background: var(--surface);
@@ -72,6 +135,71 @@
         }
         .tab.active { background: var(--accent); color: white; }
         .tab:hover:not(.active) { background: var(--surface2); }
+
+        /* ── Controls bar ── */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--surface2);
+            flex-wrap: wrap;
+        }
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text2);
+        }
+        .difficulty-dots {
+            display: flex;
+            gap: 3px;
+        }
+        .difficulty-dot {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--surface2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .difficulty-dot.active { background: var(--primary); color: white; }
+        .difficulty-dot:hover:not(.active) { background: var(--surface3); }
+        .topic-selector {
+            position: relative;
+            margin-left: auto;
+        }
+        .topic-dropdown {
+            appearance: none;
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--surface3);
+            border-radius: var(--radius-sm);
+            padding: 6px 30px 6px 10px;
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+        .topic-dropdown:focus { border-color: var(--accent); }
+        .topic-selector::after {
+            content: '▾';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--text2);
+            pointer-events: none;
+        }
+
+        /* ── Chat area ── */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -85,8 +213,10 @@
             padding: 14px 18px;
             border-radius: var(--radius);
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
             animation: fadeIn 0.3s ease;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .message.user {
@@ -100,11 +230,28 @@
             background: var(--surface);
             border-bottom-left-radius: 4px;
         }
+        .message .step-label {
+            display: inline-block;
+            background: var(--primary-dim);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .message .encouragement {
+            display: block;
+            color: var(--primary);
+            font-style: italic;
+            margin-top: 8px;
+            font-size: 13px;
+        }
         .message code {
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
-            font-family: 'SF Mono', monospace;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 13px;
         }
         .message pre {
@@ -113,38 +260,65 @@
             border-radius: 8px;
             margin: 8px 0;
             overflow-x: auto;
-            font-family: 'SF Mono', monospace;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 13px;
         }
-        .difficulty-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--surface2);
-            font-size: 12px;
+
+        /* ── Welcome screen ── */
+        .welcome {
+            text-align: center;
+            padding: 30px 20px 20px;
             color: var(--text2);
         }
-        .difficulty-dots {
+        .welcome .emoji { font-size: 48px; margin-bottom: 12px; }
+        .welcome h2 { color: var(--text); font-size: 20px; margin-bottom: 6px; }
+        .welcome p { font-size: 14px; line-height: 1.6; max-width: 440px; margin: 0 auto; }
+        .suggestions {
             display: flex;
-            gap: 4px;
-        }
-        .difficulty-dot {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--surface2);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
             justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
+            margin-top: 16px;
+        }
+        .suggestion {
+            padding: 8px 14px;
+            background: var(--surface2);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
             transition: all 0.2s;
         }
-        .difficulty-dot.active { background: var(--primary); color: white; }
-        .difficulty-dot:hover:not(.active) { background: var(--surface2); opacity: 0.8; }
+        .suggestion:hover { background: var(--accent); color: white; }
+
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 14px 18px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border-bottom-left-radius: 4px;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--text2);
+            margin: 0 2px;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        .image-preview {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .hidden { display: none !important; }
+
+        /* ── Input area ── */
         .input-area {
             background: var(--surface);
             padding: 12px 16px;
@@ -188,16 +362,17 @@
         .btn-primary:hover { opacity: 0.9; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-ghost { background: var(--surface2); color: var(--text); }
-        .btn-ghost:hover { background: var(--surface2); opacity: 0.8; }
+        .btn-ghost:hover { background: var(--surface3); }
         .btn-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
         }
-        .quiz-panel { padding: 20px; }
+
+        /* ── Quiz Tab ── */
+        .quiz-panel { padding: 20px; overflow-y: auto; }
         .quiz-question {
             background: var(--surface);
             border-radius: var(--radius);
@@ -218,96 +393,238 @@
         .quiz-option.selected { background: var(--accent); }
         .quiz-option.correct { background: var(--primary); }
         .quiz-option.wrong { background: var(--danger); }
-        .progress-panel { padding: 20px; }
+        .quiz-subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .quiz-subject-btn {
+            padding: 12px 8px;
+            background: var(--surface2);
+            border: 1px solid var(--surface3);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .quiz-subject-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+        /* ── Progress Tab ── */
+        .progress-panel { padding: 20px; overflow-y: auto; }
+        .progress-hero {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(48,209,88,0.08) 0%, rgba(10,132,255,0.08) 100%);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        .progress-hero .xp-bar {
+            width: 100%;
+            max-width: 300px;
+            height: 12px;
+            background: var(--surface2);
+            border-radius: 6px;
+            margin: 12px auto 4px;
+            overflow: hidden;
+        }
+        .progress-hero .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 6px;
+            transition: width 0.6s ease;
+        }
+        .progress-hero .xp-label {
+            font-size: 11px;
+            color: var(--text2);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
         .stat-card {
             background: var(--surface);
             border-radius: var(--radius);
             padding: 16px;
-            margin-bottom: 12px;
         }
-        .stat-card h3 { font-size: 14px; color: var(--text2); margin-bottom: 8px; }
-        .stat-card .value { font-size: 32px; font-weight: 700; }
-        .stat-card .unit { font-size: 14px; color: var(--text2); }
-        .welcome {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text2);
-        }
-        .welcome .emoji { font-size: 48px; margin-bottom: 16px; }
-        .welcome h2 { color: var(--text); font-size: 20px; margin-bottom: 8px; }
-        .welcome p { font-size: 14px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
-        .suggestions {
+        .stat-card h3 { font-size: 12px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
+        .stat-card .unit { font-size: 13px; color: var(--text2); }
+        .topic-bars { margin-top: 8px; }
+        .topic-bar-row {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 8px;
-            justify-content: center;
-            margin-top: 16px;
+            margin-bottom: 10px;
         }
-        .suggestion {
-            padding: 8px 14px;
+        .topic-bar-label {
+            width: 90px;
+            font-size: 12px;
+            color: var(--text2);
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .topic-bar-track {
+            flex: 1;
+            height: 8px;
             background: var(--surface2);
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-radius: 4px;
+            overflow: hidden;
         }
-        .suggestion:hover { background: var(--accent); color: white; }
-        .typing-indicator {
-            align-self: flex-start;
-            padding: 14px 18px;
+        .topic-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .topic-bar-pct {
+            width: 32px;
+            font-size: 11px;
+            color: var(--text3);
+            text-align: right;
+        }
+
+        /* ── How It Works Tab ── */
+        .howitworks-panel { padding: 20px; overflow-y: auto; }
+        .arch-section {
             background: var(--surface);
             border-radius: var(--radius);
-            border-bottom-left-radius: 4px;
+            padding: 20px;
+            margin-bottom: 16px;
         }
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
+        .arch-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .arch-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text2);
+        }
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .arch-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+        }
+        .arch-step-num {
+            width: 28px; height: 28px;
+            background: var(--accent);
             border-radius: 50%;
-            background: var(--text2);
-            margin: 0 2px;
-            animation: bounce 1.4s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
         }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-8px); }
+        .arch-step-text h4 { font-size: 14px; margin-bottom: 2px; }
+        .arch-step-text p { font-size: 12px; color: var(--text2); margin: 0; }
+        .arch-arrow {
+            text-align: center;
+            color: var(--text3);
+            font-size: 18px;
+            line-height: 1;
         }
-        .image-preview {
-            max-width: 200px;
-            border-radius: 8px;
-            margin-top: 8px;
+        .offgrid-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
         }
-        .hidden { display: none !important; }
+        .offgrid-item {
+            padding: 14px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+        .offgrid-item .icon { font-size: 24px; margin-bottom: 6px; }
+        .offgrid-item .label { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .offgrid-item .desc { font-size: 11px; color: var(--text2); }
+        .compare-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .compare-cell {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            text-align: center;
+        }
+        .compare-cell.good { background: rgba(48,209,88,0.15); color: var(--primary); }
+        .compare-cell.bad { background: rgba(255,69,58,0.1); color: var(--danger); }
+        .compare-cell.header { background: var(--surface2); color: var(--text2); font-weight: 600; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">🎓</div>
-        <div>
+        <div class="header-text">
             <h1>EduGemma</h1>
             <div class="subtitle">Offline AI STEM Tutor</div>
         </div>
-        <div id="statusBadge" class="status-badge status-offline">Offline</div>
+        <div id="statusBadge" class="status-badge status-offline">Demo</div>
+    </div>
+
+    <div id="offlineBanner" class="offline-banner">
+        <div class="pulse-dot"></div>
+        <div class="banner-text">
+            <strong>Offline Demo Mode</strong> — Interactive previews powered by curated responses. Connect Gemma 4 for full AI tutoring.
+        </div>
+        <div class="badge">DEMO</div>
     </div>
 
     <div class="tabs">
         <div class="tab active" data-tab="chat" onclick="switchTab('chat')">💬 Chat</div>
         <div class="tab" data-tab="quiz" onclick="switchTab('quiz')">🧪 Quiz</div>
         <div class="tab" data-tab="progress" onclick="switchTab('progress')">📊 Progress</div>
+        <div class="tab" data-tab="howitworks" onclick="switchTab('howitworks')">⚙️ How It Works</div>
     </div>
 
-    <div class="difficulty-selector">
-        <span>Level:</span>
-        <div class="difficulty-dots">
-            <div class="difficulty-dot" data-level="1" onclick="setDifficulty(1)">1</div>
-            <div class="difficulty-dot" data-level="2" onclick="setDifficulty(2)">2</div>
-            <div class="difficulty-dot active" data-level="3" onclick="setDifficulty(3)">3</div>
-            <div class="difficulty-dot" data-level="4" onclick="setDifficulty(4)">4</div>
-            <div class="difficulty-dot" data-level="5" onclick="setDifficulty(5)">5</div>
+    <div class="controls-bar">
+        <div class="difficulty-selector">
+            <span>Level:</span>
+            <div class="difficulty-dots">
+                <div class="difficulty-dot" data-level="1" onclick="setDifficulty(1)">1</div>
+                <div class="difficulty-dot" data-level="2" onclick="setDifficulty(2)">2</div>
+                <div class="difficulty-dot active" data-level="3" onclick="setDifficulty(3)">3</div>
+                <div class="difficulty-dot" data-level="4" onclick="setDifficulty(4)">4</div>
+                <div class="difficulty-dot" data-level="5" onclick="setDifficulty(5)">5</div>
+            </div>
+            <span id="diffLabel" style="margin-left:4px;">Intermediate</span>
         </div>
-        <span id="diffLabel" style="margin-left:8px;">Intermediate</span>
+        <div class="topic-selector">
+            <select id="topicDropdown" class="topic-dropdown" onchange="onTopicChange()">
+                <option value="all">All Subjects</option>
+                <option value="algebra">📐 Algebra</option>
+                <option value="calculus">📈 Calculus</option>
+                <option value="physics">⚡ Physics</option>
+                <option value="chemistry">🧪 Chemistry</option>
+                <option value="biology">🧬 Biology</option>
+                <option value="geometry">📏 Geometry</option>
+                <option value="cs">💻 Computer Science</option>
+                <option value="statistics">📊 Statistics</option>
+                <option value="probability">🎲 Probability</option>
+                <option value="linearalgebra">🔢 Linear Algebra</option>
+            </select>
+        </div>
     </div>
 
     <div class="main">
@@ -316,27 +633,28 @@
             <div class="welcome">
                 <div class="emoji">🧑‍🎓</div>
                 <h2>Welcome to EduGemma!</h2>
-                <p>I'm your offline STEM tutor powered by Gemma 4. Ask me anything about math, physics, chemistry, or engineering — I'll guide you step by step.</p>
-                <div class="suggestions">
-                    <div class="suggestion" onclick="askSuggestion(this)">How do I solve 2x + 5 = 13?</div>
-                    <div class="suggestion" onclick="askSuggestion(this)">Explain Newton's Third Law</div>
-                    <div class="suggestion" onclick="askSuggestion(this)">What is a mole in chemistry?</div>
-                    <div class="suggestion" onclick="askSuggestion(this)">How does integration work?</div>
-                </div>
+                <p>I'm your offline STEM tutor powered by Gemma 4. Ask me anything about math, science, or engineering — I'll guide you step by step.</p>
+                <div class="suggestions" id="suggestionsContainer"></div>
             </div>
         </div>
 
         <!-- Quiz Tab -->
         <div id="quizTab" class="quiz-panel hidden">
-            <div style="text-align:center; padding: 40px 20px; color: var(--text2);">
-                <div style="font-size: 48px; margin-bottom: 16px;">🧪</div>
-                <h2 style="color: var(--text); margin-bottom: 8px;">Adaptive Quiz</h2>
-                <p style="margin-bottom: 20px;">Test your knowledge! Questions adapt to your level.</p>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;">
-                    <button class="btn btn-ghost" onclick="startQuiz('algebra')">Algebra</button>
-                    <button class="btn btn-ghost" onclick="startQuiz('calculus')">Calculus</button>
-                    <button class="btn btn-ghost" onclick="startQuiz('physics')">Physics</button>
-                    <button class="btn btn-ghost" onclick="startQuiz('chemistry')">Chemistry</button>
+            <div style="text-align:center; padding: 30px 20px; color: var(--text2);">
+                <div style="font-size: 48px; margin-bottom: 12px;">🧪</div>
+                <h2 style="color: var(--text); margin-bottom: 6px;">Adaptive Quiz</h2>
+                <p style="margin-bottom: 20px; font-size:14px;">Test your knowledge! Questions adapt to your level.</p>
+                <div class="quiz-subject-grid" style="max-width:420px; margin:0 auto;">
+                    <button class="quiz-subject-btn" onclick="startQuiz('algebra')">📐 Algebra</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('calculus')">📈 Calculus</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('physics')">⚡ Physics</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('chemistry')">🧪 Chemistry</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('biology')">🧬 Biology</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('geometry')">📏 Geometry</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('cs')">💻 CS</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('statistics')">📊 Stats</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('probability')">🎲 Prob</button>
+                    <button class="quiz-subject-btn" onclick="startQuiz('linearalgebra')">🔢 LinAlg</button>
                 </div>
                 <div id="quizContent"></div>
             </div>
@@ -344,26 +662,153 @@
 
         <!-- Progress Tab -->
         <div id="progressTab" class="progress-panel hidden">
-            <div style="text-align:center; padding: 20px; color: var(--text2);">
-                <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
-                <h2 style="color: var(--text); margin-bottom: 8px;">Your Progress</h2>
+            <div class="progress-hero">
+                <div style="font-size:32px; margin-bottom:4px;">🏆</div>
+                <h2 style="font-size:18px; margin-bottom:2px;">Learning Journey</h2>
+                <div style="font-size:13px; color:var(--text2);" id="xpLevel">Level 1 — Beginner</div>
+                <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+                <div class="xp-label" id="xpLabel">0 / 100 XP</div>
             </div>
-            <div class="stat-card">
-                <h3>Questions Asked</h3>
-                <span class="value" id="statQuestions">0</span>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h3>Questions Asked</h3>
+                    <span class="value" id="statQuestions">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Quizzes Done</h3>
+                    <span class="value" id="statQuizzes">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Subjects Explored</h3>
+                    <span class="value" id="statTopics">0</span>
+                    <span class="unit">/ 10</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Streak</h3>
+                    <span class="value" id="statStreak">0</span>
+                    <span class="unit">🔥</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Quizzes Completed</h3>
-                <span class="value" id="statQuizzes">0</span>
+            <div class="stat-card" style="grid-column: 1 / -1;">
+                <h3>Subject Mastery</h3>
+                <div class="topic-bars" id="topicBars"></div>
             </div>
-            <div class="stat-card">
-                <h3>Current Level</h3>
-                <span class="value" id="statLevel">3</span>
-                <span class="unit">/ 5</span>
+        </div>
+
+        <!-- How It Works Tab -->
+        <div id="howitworksTab" class="howitworks-panel hidden">
+            <div class="arch-section">
+                <h3>🌐 Offline-First Architecture</h3>
+                <p>EduGemma runs entirely on your device. No internet required after installation — not even for a "fallback." The AI model, the tutoring engine, and your progress data all live locally.</p>
+                <div class="arch-flow">
+                    <div class="arch-step">
+                        <div class="arch-step-num">1</div>
+                        <div class="arch-step-text">
+                            <h4>You Ask a Question</h4>
+                            <p>Type a STEM question, upload a photo of a textbook problem, or try a quiz — your input stays on your device.</p>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-step-num">2</div>
+                        <div class="arch-step-text">
+                            <h4>Gemma 4 Thinks Locally</h4>
+                            <p>A fine-tuned Gemma 4 E4B model processes your question via Ollama — running on your CPU/GPU. Zero cloud calls. ~2-5 second response time on any laptop.</p>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-step-num">3</div>
+                        <div class="arch-step-text">
+                            <h4>Adaptive Tutor Responds</h4>
+                            <p>Step-by-step explanations at your difficulty level, with analogies and encouragement. The engine adjusts based on your response patterns.</p>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-step-num">4</div>
+                        <div class="arch-step-text">
+                            <h4>Progress Saved Locally</h4>
+                            <p>Your mastery, quiz history, and streaks are stored in a local SQLite database. Private by default — no accounts, no cloud, no data ever leaves your device.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Topics Explored</h3>
-                <span class="value" id="statTopics">0</span>
+
+            <div class="arch-section">
+                <h3>🔋 Works Off-Grid</h3>
+                <p>Unlike cloud AI tutors, EduGemma keeps working when the internet doesn't.</p>
+                <div class="offgrid-grid">
+                    <div class="offgrid-item">
+                        <div class="icon">🏔️</div>
+                        <div class="label">Rural Schools</div>
+                        <div class="desc">1 in 4 rural US students lack broadband</div>
+                    </div>
+                    <div class="offgrid-item">
+                        <div class="icon">🌍</div>
+                        <div class="label">Developing Regions</div>
+                        <div class="desc">Only 36% internet in Sub-Saharan Africa</div>
+                    </div>
+                    <div class="offgrid-item">
+                        <div class="icon">🌀</div>
+                        <div class="label">Disaster Zones</div>
+                        <div class="desc">Learning continues when infrastructure fails</div>
+                    </div>
+                    <div class="offgrid-item">
+                        <div class="icon">🔒</div>
+                        <div class="label">Privacy-First</div>
+                        <div class="desc">COPPA/FERPA compliant by architecture</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-section">
+                <h3>🆚 Why Not Just Use ChatGPT?</h3>
+                <div class="compare-row">
+                    <div class="compare-cell header">Feature</div>
+                    <div class="compare-cell header">Cloud AI Tutor</div>
+                    <div class="compare-cell header">EduGemma</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">Works Offline</div>
+                    <div class="compare-cell bad">✗</div>
+                    <div class="compare-cell good">✓</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">Privacy</div>
+                    <div class="compare-cell bad">Data in cloud</div>
+                    <div class="compare-cell good">100% local</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">Cost</div>
+                    <div class="compare-cell bad">$20/mo+</div>
+                    <div class="compare-cell good">Free forever</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">Adaptive Difficulty</div>
+                    <div class="compare-cell bad">Generic</div>
+                    <div class="compare-cell good">Per-topic mastery</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">STEM Focus</div>
+                    <div class="compare-cell bad">General purpose</div>
+                    <div class="compare-cell good">Fine-tuned for STEM</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell header">Multilingual</div>
+                    <div class="compare-cell bad">Translation layer</div>
+                    <div class="compare-cell good">Native generation</div>
+                </div>
+            </div>
+
+            <div class="arch-section">
+                <h3>🧠 Model Details</h3>
+                <p><strong>Gemma 4 E4B</strong> — Mixture-of-Experts architecture with 4.5B active parameters per token (8B total). Fine-tuned on 500 curated STEM Q&A pairs using Unsloth for 2× faster training and 70% less memory. Runs on any laptop with 8GB+ RAM via Ollama.</p>
+                <p style="margin-top:8px;"><strong>One-command install:</strong></p>
+                <pre style="background:var(--surface2); padding:12px; border-radius:8px; margin-top:8px; font-size:13px; overflow-x:auto;">curl -fsSL https://ollama.com/install.sh | sh
+ollama pull edugemma:e4b
+python -m uvicorn main:app
+# Open http://localhost:8000 — done.</pre>
             </div>
         </div>
     </div>
@@ -387,9 +832,62 @@
         const API_URL = window.location.origin;
         let currentDifficulty = 3;
         let chatHistory = [];
-        let stats = { questions: 0, quizzes: 0, topics: new Set() };
+        let backendOnline = false;
+
+        // Demo progress state (simulated)
+        let stats = {
+            questions: 0,
+            quizzes: 0,
+            xp: 0,
+            streak: 1,
+            topics: {},
+            topicMastery: {}
+        };
+        const ALL_TOPICS = ['algebra','calculus','physics','chemistry','biology','geometry','cs','statistics','probability','linearalgebra'];
+        ALL_TOPICS.forEach(t => { stats.topics[t] = 0; stats.topicMastery[t] = 0; });
 
         const diffLabels = {1:'Beginner', 2:'Elementary', 3:'Intermediate', 4:'Advanced', 5:'Expert'};
+
+        // ── Topic-based suggestions ──
+        const SUGGESTIONS = {
+            all: [
+                'How do I solve 2x + 5 = 13?',
+                "Explain Newton's Third Law",
+                'What is a mole in chemistry?',
+                'How does integration work?',
+                'What is natural selection?',
+                'How do I find the area of a circle?',
+            ],
+            algebra: ['How do I solve 2x + 5 = 13?', 'What is the quadratic formula?', 'How do I factor x² - 9?', 'What are systems of equations?'],
+            calculus: ['How does integration work?', "What's a derivative?", 'Explain the chain rule', 'How do I find critical points?'],
+            physics: ["Explain Newton's Third Law", 'What is kinetic energy?', 'How do circuits work?', 'What is electromagnetic induction?'],
+            chemistry: ['What is a mole in chemistry?', 'How do ionic bonds form?', 'What is Le Chatelier\'s principle?', 'Explain the periodic table trends'],
+            biology: ['What is natural selection?', 'How does DNA replication work?', 'What is cellular respiration?', 'Explain photosynthesis'],
+            geometry: ['How do I find the area of a circle?', 'What is the Pythagorean theorem?', 'How do I calculate volume of a sphere?', 'Explain similar triangles'],
+            cs: ['What is an algorithm?', 'How does recursion work?', 'What is Big O notation?', 'Explain binary search'],
+            statistics: ['What is a normal distribution?', 'How do I calculate standard deviation?', 'What is the central limit theorem?', 'Explain p-values'],
+            probability: ['What is conditional probability?', 'How do I use Bayes\' theorem?', 'What is the difference between permutation and combination?', 'Explain expected value'],
+            linearalgebra: ['What is a matrix?', 'How do I multiply matrices?', 'What are eigenvalues?', 'Explain vector spaces'],
+        };
+
+        function renderSuggestions() {
+            const topic = document.getElementById('topicDropdown').value;
+            const list = SUGGESTIONS[topic] || SUGGESTIONS.all;
+            const container = document.getElementById('suggestionsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            list.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'suggestion';
+                div.textContent = s;
+                div.onclick = () => askSuggestion(div);
+                container.appendChild(div);
+            });
+        }
+
+        function onTopicChange() {
+            renderSuggestions();
+        }
 
         function setDifficulty(level) {
             currentDifficulty = level;
@@ -404,6 +902,7 @@
             document.getElementById('chatTab').classList.toggle('hidden', tab !== 'chat');
             document.getElementById('quizTab').classList.toggle('hidden', tab !== 'quiz');
             document.getElementById('progressTab').classList.toggle('hidden', tab !== 'progress');
+            document.getElementById('howitworksTab').classList.toggle('hidden', tab !== 'howitworks');
             if (tab === 'progress') updateProgress();
         }
 
@@ -440,23 +939,60 @@
             document.getElementById('imagePreview').classList.add('hidden');
         }
 
+        // ── XP / Progress simulation ──
+        function addXP(amount, topic) {
+            stats.xp += amount;
+            stats.streak = Math.min(stats.streak + 1, 50);
+            if (topic && stats.topics.hasOwnProperty(topic)) {
+                stats.topics[topic]++;
+                // Mastery increases slower over time
+                const t = stats.topics[topic];
+                stats.topicMastery[topic] = Math.min(100, Math.round(100 * (1 - 1/(1 + t * 0.3))));
+            }
+        }
+
+        function getLevel() {
+            if (stats.xp >= 2000) return { level: 5, name: 'Master', next: Infinity };
+            if (stats.xp >= 1000) return { level: 4, name: 'Advanced', next: 2000 };
+            if (stats.xp >= 500) return { level: 3, name: 'Intermediate', next: 1000 };
+            if (stats.xp >= 200) return { level: 2, name: 'Elementary', next: 500 };
+            return { level: 1, name: 'Beginner', next: 200 };
+        }
+
+        function detectTopic(msg) {
+            const topicKeywords = {
+                algebra: ['algebra', 'equation', 'solve for', 'polynomial', 'factor', 'quadratic', 'variable', 'linear'],
+                calculus: ['calculus', 'derivative', 'integral', 'integration', 'differentiat', 'limit', 'chain rule', 'rate of change'],
+                physics: ['physics', 'newton', 'force', 'velocity', 'acceleration', 'energy', 'momentum', 'circuit', 'electromagnetic', 'gravity', 'wave'],
+                chemistry: ['chemistry', 'mole', 'bond', 'atom', 'element', 'reaction', 'ion', 'acid', 'base', 'periodic', 'le chatelier', 'electron'],
+                biology: ['biology', 'cell', 'dna', 'gene', 'evolution', 'natural selection', 'photosynthesis', 'respiration', 'enzyme', 'protein', 'organism', 'mitosis', 'meiosis'],
+                geometry: ['geometry', 'triangle', 'circle', 'area', 'volume', 'angle', 'pythagor', 'similar', 'congruent', 'polygon', 'perimeter'],
+                cs: ['algorithm', 'recursion', 'binary', 'sort', 'data structure', 'big o', 'hash', 'tree', 'graph', 'loop', 'complexity', 'programming'],
+                statistics: ['statistics', 'mean', 'median', 'standard deviation', 'variance', 'normal distribution', 'p-value', 'hypothesis', 'correlation', 'regression', 'sample', 'central limit'],
+                probability: ['probability', 'bayes', 'random', 'expected value', 'permutation', 'combination', 'odds', 'likelihood', 'independent', 'mutually exclusive'],
+                linearalgebra: ['matrix', 'matrices', 'vector', 'eigenvalue', 'eigenvector', 'linear algebra', 'determinant', 'span', 'basis', 'rank', 'transpose', 'inverse']
+            };
+            const lower = msg.toLowerCase();
+            for (const [topic, keywords] of Object.entries(topicKeywords)) {
+                if (keywords.some(k => lower.includes(k))) return topic;
+            }
+            return null;
+        }
+
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             if (!message) return;
 
-            // Remove welcome
             const welcome = document.querySelector('.welcome');
             if (welcome) welcome.remove();
 
-            // Add user message
             addMessage('user', message);
             chatHistory.push({ role: 'user', content: message });
             input.value = '';
             input.style.height = 'auto';
             clearImage();
 
-            // Show typing
             const typing = document.createElement('div');
             typing.className = 'typing-indicator';
             typing.innerHTML = '<span></span><span></span><span></span>';
@@ -479,23 +1015,43 @@
                 addMessage('assistant', data.reply);
                 chatHistory.push({ role: 'assistant', content: data.reply });
             } catch (err) {
-                // Demo mode - show pre-crafted responses
-                await new Promise(r => setTimeout(r, 800 + Math.random() * 1200)); // Simulate thinking
+                await new Promise(r => setTimeout(r, 600 + Math.random() * 1400));
                 typing.remove();
-                const reply = getDemoResponse(message);
+                const topic = detectTopic(message) || document.getElementById('topicDropdown').value;
+                const reply = getDemoResponse(message, topic);
                 addMessage('assistant', reply);
                 chatHistory.push({ role: 'assistant', content: reply });
+                addXP(15, topic === 'all' ? detectTopic(message) : topic);
+                stats.questions++;
             }
             stats.questions++;
-            detectTopic(message);
+            const topic = detectTopic(message) || document.getElementById('topicDropdown').value;
+            if (topic && topic !== 'all') addXP(15, topic);
         }
 
         function addMessage(role, content) {
             const div = document.createElement('div');
             div.className = `message ${role}`;
-            div.textContent = content;
+            // Simple markdown-ish rendering for assistant
+            if (role === 'assistant') {
+                div.innerHTML = formatResponse(content);
+            } else {
+                div.textContent = content;
+            }
             document.getElementById('chatTab').appendChild(div);
             scrollChat();
+        }
+
+        function formatResponse(text) {
+            // Bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Code
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            // Step labels
+            text = text.replace(/^(Step \d+[^:]*:)/gm, '<span class="step-label">$1</span>');
+            // Encouragement lines
+            text = text.replace(/^(💡.*|🎯.*|✨.*|💪.*|🌟.*|Nice!.*|Great!.*|Awesome!.*)$/gm, '<span class="encouragement">$1</span>');
+            return text;
         }
 
         function scrollChat() {
@@ -503,15 +1059,123 @@
             chat.scrollTop = chat.scrollHeight;
         }
 
-        function detectTopic(msg) {
-            const topics = ['algebra', 'calculus', 'physics', 'chemistry', 'geometry', 'biology', 'engineering'];
-            const lower = msg.toLowerCase();
-            topics.forEach(t => { if (lower.includes(t)) stats.topics.add(t); });
+        // ── Demo Responses ──
+        const DEMO_RESPONSES = {
+            algebra: [
+                "Let's work through this step by step!\n\n**Step 1:** Identify what we're solving for. We need to isolate the variable x.\n\n**Step 2:** Move constants to one side. Subtract the constant from both sides of the equation — whatever you do to one side, you must do to the other to keep it balanced.\n\n**Step 3:** Divide both sides by the coefficient of x to isolate it completely.\n\n**Step 4:** Check your answer! Plug it back into the original equation to make sure both sides are equal.\n\nThe key insight: equations are like balance scales. Think of it as moving weights around — as long as you do the same thing to both sides, the scale stays balanced.\n\n💡 You've got this! Linear equations are the foundation for everything in algebra.",
+                "Great question! Let me break down the approach.\n\n**The goal:** Isolate the variable. That means getting x (or whatever variable) alone on one side of the equals sign.\n\n**Step 1:** Clear any parentheses first using the distributive property: a(b + c) = ab + ac\n\n**Step 2:** Combine like terms on each side separately.\n\n**Step 3:** Move all variable terms to one side and all constants to the other. Add or subtract from both sides as needed.\n\n**Step 4:** Divide by the coefficient to solve.\n\nThink of it like unpacking a box — you remove layers one at a time until you reach what's inside.\n\n🎯 Practice makes perfect with these. Each one gets faster!",
+            ],
+            calculus: [
+                "Great question! Let me break this down.\n\n**The derivative** measures how fast something is changing at any point. Think of it like a speedometer — it tells you your instantaneous rate of change, not your average speed.\n\n**Step 1:** Start with the power rule. For `x^n`, the derivative is `n * x^(n-1)`. This is your bread and butter.\n\n**Step 2:** For sums, differentiate each term separately. The derivative of `3x² + 2x` is just `6x + 2`.\n\n**Step 3:** For composite functions, use the chain rule: differentiate the outer function, then multiply by the derivative of the inner function.\n\n**Step 4:** Constants disappear — the derivative of `5` is `0` (a flat line has zero slope).\n\n**Analogy:** If position is where you are, velocity (derivative) is how fast you're going, and acceleration (second derivative) is how fast your speed is changing.\n\n✨ Once you internalize the power rule and chain rule, 90% of derivative problems become straightforward!",
+                "Let's think about integration — the reverse of differentiation.\n\n**Integration** is like asking: \"What function would I need to differentiate to get this?\" It's running the process backwards.\n\n**Step 1:** The basic rule reverses the power rule. The integral of `x^n` is `x^(n+1) / (n+1)` + C.\n\n**Step 2:** Don't forget the constant of integration `+ C`! Since the derivative of any constant is 0, we can't know which constant the original function had.\n\n**Step 3:** For definite integrals (with bounds), evaluate the antiderivative at the upper bound minus the lower bound. This gives you the area under the curve.\n\n**Analogy:** If derivative = cutting a movie into frames, then integral = stitching frames back into the movie. One breaks down, the other rebuilds.\n\n💡 Integration is powerful — it lets you compute areas, volumes, and total accumulated change!",
+            ],
+            physics: [
+                "Let's think about this physically first, then do the math.\n\n**Newton's Laws** are really about one thing: forces cause changes in motion.\n\n**Step 1 — 1st Law (Inertia):** An object at rest stays at rest, and an object in motion stays in motion, unless acted on by an unbalanced force. This is why your coffee flies forward when you brake suddenly.\n\n**Step 2 — 2nd Law (F = ma):** The net force on an object equals its mass times its acceleration. Heavier objects need more force to accelerate. This is quantitative — it lets you predict exactly how things move.\n\n**Step 3 — 3rd Law (Action-Reaction):** Every force has an equal and opposite force. You push the ground backward, it pushes you forward. That's how walking works!\n\n**Real-world example:** A rocket pushes exhaust gas downward (action), and the gas pushes the rocket upward (reaction). No ground needed — that's why rockets work in space.\n\n💪 Newton's Laws explain everything from why you need a seatbelt to how rockets reach orbit!",
+                "Let's break down energy — one of the most powerful concepts in physics.\n\n**Kinetic energy** is energy of motion: `KE = ½mv²`. The faster or heavier something is, the more energy it carries.\n\n**Potential energy** is stored energy — like a ball held up high (`PE = mgh`) or a compressed spring.\n\n**Step 1:** Identify what types of energy are present at the start.\n\n**Step 2:** Identify what types of energy are present at the end.\n\n**Step 3:** Apply conservation of energy: total energy at start = total energy at end (in a closed system). Energy never disappears — it just transforms.\n\n**Analogy:** Think of energy like money in a bank. You can transfer it between accounts (kinetic ↔ potential), but the total amount doesn't change unless something adds or removes it (work/heat).\n\n🎯 Energy conservation problems become almost automatic once you practice identifying the energy forms at each point!",
+            ],
+            chemistry: [
+                "Here's the key concept:\n\n**A mole** is just a counting unit, like \"dozen\" means 12.\n\n• 1 dozen eggs = 12 eggs\n• 1 mole of atoms = 6.022 × 10²³ atoms\n\n**Step 1:** Avogadro's number (`6.022 × 10²³`) is the conversion factor between \"number of particles\" and \"moles.\"\n\n**Step 2:** Molar mass tells you the mass of one mole. For carbon, that's 12.01 g/mol. For water (H₂O), it's 18.02 g/mol.\n\n**Step 3:** The three-way conversion: mass ↔ moles ↔ particles. You always go through moles as the middle step.\n\n  - Mass → Moles: divide by molar mass\n  - Moles → Particles: multiply by Avogadro's number\n  - Particles → Moles: divide by Avogadro's number\n\n**Analogy:** Moles are like currency exchange. You can't directly compare grams to number of atoms — you need to convert through the \"mole\" exchange rate.\n\n✨ Moles unlock stoichiometry — the math behind every chemical reaction!",
+                "Let's explore chemical bonding — why atoms stick together.\n\n**Ionic bonds** form when one atom gives an electron to another. The donor becomes a positive ion (cation), the receiver becomes negative (anion). Opposite charges attract → bond.\n\n**Step 1:** Metals tend to lose electrons (low ionization energy), nonmetals tend to gain them (high electron affinity).\n\n**Step 2:** The electrostatic attraction between the resulting ions holds them together in a crystal lattice.\n\n**Step 3:** Ionic compounds have high melting points, conduct electricity when dissolved, and are typically brittle.\n\n**Covalent bonds** form when atoms share electrons instead of transferring them. Both atoms \"want\" the same electrons, so they compromise by sharing.\n\n**Analogy:** Ionic bonding is like one person giving money to another (transfer). Covalent bonding is like two people sharing an umbrella (shared resource). Both result in stability, but through different mechanisms.\n\n💡 Understanding bonding explains why salt dissolves in water but oil doesn't!",
+            ],
+            biology: [
+                "Great question! Let me explain one of the most important ideas in biology.\n\n**Natural selection** is the mechanism Darwin proposed for how species evolve. It's not random — it's a filter.\n\n**Step 1 — Variation:** Within any population, individuals have genetic differences. Some are faster, some are better camouflaged, some are more disease-resistant.\n\n**Step 2 — Selection Pressure:** The environment \"selects\" which traits are advantageous. Predators, competition, climate — they all act as filters.\n\n**Step 3 — Differential Survival:** Individuals with advantageous traits survive longer and reproduce more. That's it. No goal, no direction — just \"what works, survives.\"\n\n**Step 4 — Heredity:** Advantageous traits are passed to offspring because they're encoded in DNA. Over many generations, the population shifts.\n\n**Analogy:** Imagine a sieve. You pour in a mixed population, and the environment is the mesh. Only certain shapes pass through. That's natural selection — not \"survival of the strongest,\" but survival of the best fit.\n\n🌟 Natural selection explains everything from antibiotic resistance to peppered moths to Darwin's finches!",
+                "Let's break down how your cells actually power everything you do.\n\n**Cellular respiration** converts glucose and oxygen into ATP — the energy currency of cells.\n\n**Step 1 — Glycolysis:** In the cytoplasm, glucose (6 carbons) is split into two pyruvate molecules (3 carbons each). This produces 2 ATP and 2 NADH. No oxygen needed yet!\n\n**Step 2 — Krebs Cycle:** In the mitochondria, pyruvate is fully broken down, releasing CO₂ and generating NADH and FADH₂ (electron carriers). Think of this as \"recharging batteries.\"\n\n**Step 3 — Electron Transport Chain:** The electron carriers donate electrons to a chain of proteins in the mitochondrial membrane. This pumps protons, creating a gradient — like water behind a dam.\n\n**Step 4 — ATP Synthase:** Protons flow back through ATP synthase (the turbine), and that mechanical energy produces ~32-34 ATP. This is where most energy is harvested.\n\n**Overall:** C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ~36-38 ATP\n\n**Analogy:** Glucose is the fuel. Mitochondria are the power plant. ATP is the electricity. Every cell activity runs on this electricity.\n\n💪 Understanding respiration connects to exercise science, nutrition, medicine, and even climate change!",
+            ],
+            geometry: [
+                "Let's work through the key concepts!\n\n**The Pythagorean Theorem** is one of the most useful tools in all of math:\n\n`a² + b² = c²`\n\nwhere `a` and `b` are the legs of a right triangle and `c` is the hypotenuse (the side opposite the right angle, always the longest side).\n\n**Step 1:** Identify the right angle in your triangle. The two sides that form it are the legs.\n\n**Step 2:** If you know both legs, plug them in: `c = √(a² + b²)`.\n\n**Step 3:** If you know the hypotenuse and one leg, rearrange: the missing leg = `√(c² - known²)`.\n\n**Step 4:** Always verify — the hypotenuse should be the largest value.\n\n**Real applications:** GPS navigation, construction (making sure walls are square), finding screen diagonal sizes, video game physics...\n\n**Analogy:** Think of it as the \"shortcut detector.\" Walking 3 blocks east then 4 blocks north = 5 blocks diagonally. The theorem tells you the diagonal distance.\n\n✨ Pythagorean triples (3-4-5, 5-12-13, 8-15-17) show up everywhere — memorize the common ones!",
+                "Let's explore circles — perfectly symmetric and surprisingly powerful!\n\n**Key formulas:**\n• Area = `πr²`\n• Circumference = `2πr`\n\n**Step 1:** The radius `r` is the key measurement. If you're given the diameter, divide by 2 first.\n\n**Step 2:** For area problems, square the radius first, then multiply by π. Don't square π!\n\n**Step 3:** For arc length, use the proportion: `arc/circumference = central angle/360°`. It's just a fraction of the full circle.\n\n**Step 4:** For sector area, same idea: `sector area/full area = central angle/360°`.\n\n**Analogy:** A pizza with radius r. The whole pizza has area πr². A slice with a 60° angle is 60/360 = 1/6 of the pizza. So the slice area = πr²/6.\n\n🎯 Circle problems become easy when you remember: everything is proportional to the angle!",
+            ],
+            cs: [
+                "Let's break down what algorithms really are!\n\n**An algorithm** is a step-by-step procedure for solving a problem. Think of it as a recipe — precise instructions that always produce the correct result.\n\n**Step 1:** Define the problem clearly. What are the inputs? What's the expected output?\n\n**Step 2:** Think about the brute force approach first. Can you solve it by checking every possibility? This gives you a baseline.\n\n**Step 3:** Look for patterns or structures you can exploit. Is the data sorted? Can you eliminate half the possibilities each step (binary search)? Can you break it into smaller subproblems (divide and conquer)?\n\n**Step 4:** Analyze the time complexity using Big O notation. This tells you how your algorithm scales as input grows.\n\n**Common patterns:**\n• **Two pointers** — for sorted arrays/strings\n• **Sliding window** — for subarray/substring problems\n• **Hash map** — for counting or lookup problems\n• **BFS/DFS** — for graphs and trees\n\n**Analogy:** A brute force algorithm is like looking for a book by checking every shelf. A binary search algorithm is like opening the catalog, going to the right section, then the right shelf — exponentially faster.\n\n💡 Learning algorithm patterns is like learning chess openings — you recognize situations and apply known strategies!",
+                "Let's talk about recursion — one of the most elegant concepts in computer science.\n\n**Recursion** is when a function calls itself. It solves problems by breaking them into smaller versions of the same problem.\n\n**Step 1 — Base case:** Every recursive function needs a stopping condition. Without it, you get infinite recursion → stack overflow.\n\n**Step 2 — Recursive case:** Reduce the problem and call yourself. The key insight: trust that the recursive call works, then build on it.\n\n**Step 3 — The call stack:** Each recursive call adds a frame to the stack. When the base case is reached, frames unwind and results combine.\n\n**Classic example — Factorial:**\n```\nfactorial(n):\n  if n == 0: return 1     (base case)\n  else: return n * factorial(n-1)  (recursive case)\n```\n\n`factorial(4) = 4 × 3 × 2 × 1 × 1 = 24`\n\n**Analogy:** Imagine you're in a movie theater and want to know your row number. You ask the person in front: \"What row are you in?\" They ask the person in front of them, and so on. The person in row 1 knows the answer (base case!). Each person then adds 1 to the answer they receive.\n\n🎯 Master recursion by always identifying the base case first, then trusting the recursive call!",
+            ],
+            statistics: [
+                "Let's unpack one of the most important concepts in statistics.\n\n**The normal distribution** (bell curve) describes how many natural phenomena are distributed — heights, test scores, measurement errors.\n\n**Step 1:** The curve is defined by two parameters: the mean `μ` (center) and standard deviation `σ` (spread).\n\n**Step 2:** The **68-95-99.7 rule** is your quick reference:\n• ~68% of data falls within 1σ of the mean\n• ~95% within 2σ\n• ~99.7% within 3σ\n\n**Step 3:** To find the probability of a value, convert to a z-score: `z = (x - μ) / σ`. This tells you how many standard deviations away from the mean.\n\n**Step 4:** Use a z-table (or calculator) to find the probability. Positive z = above average, negative = below.\n\n**Analogy:** Imagine a mountain. The peak is the mean. The steepness of the slopes is the standard deviation. A small σ = narrow, tall peak (most data clustered near center). A large σ = wide, flat peak (data spread out).\n\n🌟 The normal distribution is so common that when something ISN'T normally distributed, that's often the interesting finding!",
+                "Let's break down standard deviation — the most important measure of spread.\n\n**Standard deviation (σ)** tells you, on average, how far each data point is from the mean.\n\n**Step 1:** Calculate the mean: `μ = Σx / n`\n\n**Step 2:** Find each deviation: how far each point is from the mean: `(xᵢ - μ)`\n\n**Step 3:** Square each deviation: `(xᵢ - μ)²`. This makes all values positive (negative deviations would cancel out otherwise).\n\n**Step 4:** Average the squared deviations → this is the **variance** (σ²).\n\n**Step 5:** Take the square root of the variance → **standard deviation** (σ).\n\n**Formula:** `σ = √( Σ(xᵢ - μ)² / n )`\n\n**Analogy:** If the mean is where everyone is standing in a group photo, standard deviation is how spread out the group is. A tight cluster = small σ. People scattered everywhere = large σ.\n\n**Why it matters:** Two datasets can have the same mean but completely different spreads. The mean alone never tells the full story.\n\n💪 SD is the foundation of confidence intervals, hypothesis testing, and basically all of inferential statistics!",
+            ],
+            probability: [
+                "Great question! Conditional probability is at the heart of real-world reasoning.\n\n**Conditional probability** `P(A|B)` means: \"What's the probability of A, given that B has already happened?\"\n\n**Step 1:** The formula: `P(A|B) = P(A∩B) / P(B)`\n\n**Step 2:** The denominator shrinks the universe. Instead of all possible outcomes, we only consider outcomes where B is true.\n\n**Step 3:** If A and B are independent, then `P(A|B) = P(A)`. Knowing B happened doesn't change the probability of A at all.\n\n**Example:** What's P(rain|clouds)? Higher than P(rain) alone, because clouds and rain are dependent.\n\n**Bayes' Theorem** flips the condition: `P(A|B) = P(B|A) × P(A) / P(B)`\n\nThis lets you update your beliefs when you get new evidence. Extremely powerful in medicine, spam filtering, and machine learning.\n\n**Analogy:** You hear an alarm. P(burglary|alarm) depends on how often alarms go off for non-burglary reasons. If your alarm is triggered by cats 99% of the time, P(burglary|alarm) is low despite the alarm.\n\n🎯 Conditional probability is how you think rationally in an uncertain world!",
+                "Let's clarify two concepts people constantly confuse.\n\n**Permutation:** Order matters. ABC ≠ BAC.\n• Formula: `P(n,r) = n! / (n-r)!`\n• Example: How many ways to arrange 3 people in a line from a group of 10?\n\n**Combination:** Order doesn't matter. ABC = BAC (same group).\n• Formula: `C(n,r) = n! / (r!(n-r)!)`\n• Example: How many ways to choose 3 people from a group of 10 (no ordering)?\n\n**Step 1:** Read the problem carefully. Keywords:\n• \"Arrange,\" \"order,\" \"sequence,\" \"lineup\" → permutation\n• \"Choose,\" \"select,\" \"group,\" \"committee\" → combination\n\n**Step 2:** If swapping any two items creates a different valid outcome, it's a permutation.\n\n**Step 3:** Compute using the formula. Factorials get big fast — use a calculator!\n\n**Analogy:** Picking a 4-digit phone passcode = permutation (1234 ≠ 4321). Picking 4 toppings for a pizza = combination (pepperoni+mushroom+olive+onion = same regardless of order).\n\n💡 The only difference is that extra `r!` in the denominator of combinations, which accounts for the fact that order doesn't matter!",
+            ],
+            linearalgebra: [
+                "Let's build up matrices from the ground up!\n\n**A matrix** is a rectangular array of numbers arranged in rows and columns. It's the fundamental data structure of linear algebra.\n\n**Step 1:** Dimensions matter. An `m × n` matrix has `m` rows and `n` columns. A `2×3` matrix has 2 rows, 3 columns.\n\n**Step 2:** Matrices represent systems of equations compactly. Instead of writing:\n```\n2x + 3y = 5\n4x -  y = 3\n```\nWe write: `[[2, 3], [4, -1]] × [x, y] = [5, 3]`\n\n**Step 3:** Key operations:\n• **Addition:** Add corresponding elements (must be same size)\n• **Scalar multiplication:** Multiply every element by the scalar\n• **Matrix multiplication:** Row × column dot products (inner dimensions must match)\n\n**Step 4:** Matrix multiplication is NOT commutative. `AB ≠ BA` in general!\n\n**Analogy:** Think of a matrix as a recipe — each row is a recipe, each column is an ingredient, and the numbers are how much of each ingredient. Matrix multiplication combines recipes.\n\n🔢 Matrices are everywhere: computer graphics, machine learning, physics simulations, quantum mechanics, Google's PageRank...",
+                "Eigenvalues are one of the most beautiful and useful concepts in math. Let's demystify them.\n\n**The idea:** When you multiply a matrix by most vectors, the vector changes direction. But some special vectors only get stretched (or compressed) — they stay on the same line. Those are **eigenvectors**, and the stretch factor is the **eigenvalue**.\n\n**Mathematically:** `Av = λv`, where:\n• `A` = the matrix\n• `v` = eigenvector (doesn't change direction)\n• `λ` = eigenvalue (how much it's stretched)\n\n**Step 1:** To find eigenvalues, solve: `det(A - λI) = 0`. This gives you the **characteristic equation**.\n\n**Step 2:** Solve the characteristic polynomial for λ. For a 2×2 matrix, you get a quadratic.\n\n**Step 3:** For each eigenvalue λ, find eigenvectors by solving `(A - λI)v = 0`.\n\n**Why they matter:**\n• **PageRank:** Google's algorithm is literally an eigenvalue problem\n• **Vibration analysis:** Eigenvalues = natural frequencies\n• **PCA (machine learning):** Eigenvalues of the covariance matrix tell you the most important dimensions\n• **Quantum mechanics:** Observable values are eigenvalues of operators\n\n**Analogy:** Imagine a rubber sheet. Push on it and it deforms. But along certain directions, pushing just stretches — those directions are eigenvectors, and the stretch ratio is the eigenvalue.\n\n🌟 If you understand eigenvalues, you understand the soul of linear algebra!",
+            ],
+        };
+
+        function getDemoResponse(message, topic) {
+            const lower = message.toLowerCase();
+            // Try to detect topic from message if it wasn't passed or is 'all'
+            let resolvedTopic = topic;
+            if (!resolvedTopic || resolvedTopic === 'all') {
+                resolvedTopic = detectTopic(message) || 'algebra';
+            }
+            const responses = DEMO_RESPONSES[resolvedTopic];
+            if (responses) {
+                // Pick a response (alternate for variety)
+                const idx = stats.topics[resolvedTopic] % responses.length;
+                return responses[idx];
+            }
+            // Fallback generic
+            return "That's a great question! Let me think about this step by step.\n\nIn STEM, we always start by identifying what we know and what we need to find. Then we choose the right tools (formulas, principles) to connect the two.\n\n**Step 1:** Identify the given information and the unknown.\n\n**Step 2:** Select the relevant concept or formula.\n\n**Step 3:** Substitute and solve carefully, checking units and reasonableness.\n\n**Step 4:** Verify your answer makes physical/logical sense.\n\nCould you tell me more about the specific topic? I can give a much more detailed walkthrough for algebra, calculus, physics, chemistry, biology, geometry, CS, stats, probability, or linear algebra!\n\n💡 The best way to learn is to practice with specific problems!";
         }
+
+        // ── Quiz ──
+        const DEMO_QUIZZES = {
+            algebra: [
+                { question: "Solve for x: 3x - 7 = 14", options: ["A) x = 7", "B) x = 21", "C) x = 3", "D) x = 5"], answer: "A", explanation: "3x - 7 = 14 → 3x = 21 → x = 7" },
+                { question: "Factor: x² - 16", options: ["A) (x-4)(x+4)", "B) (x-8)(x+2)", "C) (x-16)(x+1)", "D) (x-4)²"], answer: "A", explanation: "Difference of squares: a² - b² = (a-b)(a+b)" },
+                { question: "What is the slope of y = 2x + 5?", options: ["A) 5", "B) 2", "C) 7", "D) -2"], answer: "B", explanation: "In y = mx + b, m is the slope" },
+            ],
+            calculus: [
+                { question: "What is the derivative of x³?", options: ["A) 3x²", "B) x²", "C) 3x", "D) 3x³"], answer: "A", explanation: "Power rule: d/dx(xⁿ) = nxⁿ⁻¹" },
+                { question: "What is ∫2x dx?", options: ["A) x² + C", "B) 2x² + C", "C) x + C", "D) 2 + C"], answer: "A", explanation: "∫2x dx = 2·x²/2 + C = x² + C" },
+                { question: "If f(x) = sin(x), what is f'(x)?", options: ["A) -cos(x)", "B) cos(x)", "C) tan(x)", "D) -sin(x)"], answer: "B", explanation: "d/dx(sin x) = cos x" },
+            ],
+            physics: [
+                { question: "A 5kg object accelerates at 3 m/s². What force is applied?", options: ["A) 15 N", "B) 1.67 N", "C) 8 N", "D) 0.6 N"], answer: "A", explanation: "F = ma = 5 × 3 = 15 N" },
+                { question: "What is the unit of work?", options: ["A) Watts", "B) Joules", "C) Newtons", "D) Meters"], answer: "B", explanation: "Work = Force × Distance, measured in Joules" },
+                { question: "Which law states: For every action, there is an equal and opposite reaction?", options: ["A) 1st Law", "B) 2nd Law", "C) 3rd Law", "D) Law of Gravitation"], answer: "C", explanation: "Newton's Third Law" },
+            ],
+            chemistry: [
+                { question: "How many atoms are in 1 mole of any substance?", options: ["A) 6.022 × 10²³", "B) 1.602 × 10⁻¹⁹", "C) 3.14 × 10²³", "D) 1.0 × 10⁶"], answer: "A", explanation: "Avogadro's number = 6.022 × 10²³" },
+                { question: "What type of bond shares electrons?", options: ["A) Ionic", "B) Covalent", "C) Metallic", "D) Hydrogen"], answer: "B", explanation: "Covalent bonds involve electron sharing between atoms" },
+                { question: "What is the pH of a neutral solution?", options: ["A) 0", "B) 7", "C) 14", "D) 1"], answer: "B", explanation: "Neutral pH = 7, below is acidic, above is basic" },
+            ],
+            biology: [
+                { question: "What organelle is the 'powerhouse of the cell'?", options: ["A) Nucleus", "B) Mitochondria", "C) Ribosome", "D) Golgi apparatus"], answer: "B", explanation: "Mitochondria produce ATP through cellular respiration" },
+                { question: "DNA stands for:", options: ["A) Deoxyribonucleic acid", "B) Diribonucleic acid", "C) Deoxyribonitric acid", "D) Dinitrogenous acid"], answer: "A", explanation: "Deoxyribo = sugar, nucleic acid = the acid type" },
+                { question: "Which process converts sunlight to chemical energy?", options: ["A) Respiration", "B) Fermentation", "C) Photosynthesis", "D) Osmosis"], answer: "C", explanation: "Photosynthesis: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂" },
+            ],
+            geometry: [
+                { question: "What is the area of a circle with radius 5?", options: ["A) 25π", "B) 10π", "C) 50π", "D) 5π"], answer: "A", explanation: "Area = πr² = π(5²) = 25π" },
+                { question: "In a right triangle with legs 6 and 8, what is the hypotenuse?", options: ["A) 14", "B) 10", "C) 12", "D) √48"], answer: "B", explanation: "c = √(6² + 8²) = √(36+64) = √100 = 10" },
+                { question: "What is the volume of a sphere with radius r?", options: ["A) 4πr²", "B) (4/3)πr³", "C) 2πr³", "D) πr³"], answer: "B", explanation: "V = (4/3)πr³" },
+            ],
+            cs: [
+                { question: "What is the time complexity of binary search?", options: ["A) O(n)", "B) O(log n)", "C) O(n²)", "D) O(1)"], answer: "B", explanation: "Binary search halves the search space each step → O(log n)" },
+                { question: "Which data structure uses FIFO (First In, First Out)?", options: ["A) Stack", "B) Queue", "C) Tree", "D) Hash Map"], answer: "B", explanation: "Queues are FIFO; Stacks are LIFO" },
+                { question: "What does recursion always need to avoid infinite loops?", options: ["A) A loop", "B) A base case", "C) A return statement", "D) Multiple parameters"], answer: "B", explanation: "Without a base case, recursion never stops → stack overflow" },
+            ],
+            statistics: [
+                { question: "What percentage of data falls within 1 standard deviation of the mean in a normal distribution?", options: ["A) 50%", "B) 68%", "C) 95%", "D) 99.7%"], answer: "B", explanation: "The 68-95-99.7 rule: 68% within 1σ, 95% within 2σ, 99.7% within 3σ" },
+                { question: "What does the median represent?", options: ["A) Most common value", "B) Average value", "C) Middle value", "D) Spread"], answer: "C", explanation: "Median = middle value when data is sorted. Mode = most common. Mean = average." },
+                { question: "What is the formula for z-score?", options: ["A) (μ - x) / σ", "B) (x - μ) / σ", "C) x / σ", "D) (x - σ) / μ"], answer: "B", explanation: "z = (x - μ) / σ — how many std devs from the mean" },
+            ],
+            probability: [
+                { question: "A fair coin is flipped 3 times. What is P(all heads)?", options: ["A) 1/2", "B) 1/4", "C) 1/8", "D) 1/6"], answer: "C", explanation: "Each flip is independent: (1/2)³ = 1/8" },
+                { question: "If P(A) = 0.3 and P(B) = 0.4, and A and B are independent, what is P(A and B)?", options: ["A) 0.7", "B) 0.12", "C) 0.1", "D) 0.5"], answer: "B", explanation: "For independent events: P(A∩B) = P(A) × P(B) = 0.3 × 0.4 = 0.12" },
+                { question: "How many ways to choose 2 items from 5 (order doesn't matter)?", options: ["A) 10", "B) 20", "C) 25", "D) 5"], answer: "A", explanation: "C(5,2) = 5! / (2! × 3!) = 10" },
+            ],
+            linearalgebra: [
+                { question: "What is the determinant of [[2,0],[0,3]]?", options: ["A) 6", "B) 5", "C) 0", "D) 3"], answer: "A", explanation: "det = 2×3 - 0×0 = 6" },
+                { question: "If Av = λv, what is λ?", options: ["A) An eigenvector", "B) An eigenvalue", "C) The determinant", "D) The trace"], answer: "B", explanation: "λ is the eigenvalue (scalar), v is the eigenvector" },
+                { question: "What condition is required for matrix multiplication AB?", options: ["A) A and B must be square", "B) Columns of A = Rows of B", "C) Rows of A = Columns of B", "D) A and B must be same size"], answer: "B", explanation: "Inner dimensions must match: if A is m×n, B must be n×p" },
+            ],
+        };
 
         async function startQuiz(topic) {
             const content = document.getElementById('quizContent');
-            content.innerHTML = '<p>Generating quiz...</p>';
 
             try {
                 const res = await fetch(`${API_URL}/api/quiz`, {
@@ -521,9 +1185,82 @@
                 });
                 const data = await res.json();
                 stats.quizzes++;
+                addXP(25, topic);
                 renderQuiz(data.questions);
             } catch (err) {
-                content.innerHTML = '<p>⚠️ Could not generate quiz. Make sure the backend is running.</p>';
+                // Demo quiz
+                const questions = DEMO_QUIZZES[topic] || DEMO_QUIZZES.algebra;
+                stats.quizzes++;
+                addXP(25, topic);
+                renderDemoQuiz(questions, topic);
+            }
+        }
+
+        function renderDemoQuiz(questions, topic) {
+            const content = document.getElementById('quizContent');
+            content.innerHTML = '';
+            let score = 0;
+            const total = questions.length;
+
+            const header = document.createElement('div');
+            header.style.cssText = 'margin-bottom:16px; font-size:14px; color:var(--text2);';
+            header.textContent = `${topic.charAt(0).toUpperCase() + topic.slice(1)} Quiz — ${total} questions`;
+            content.appendChild(header);
+
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-question';
+                div.innerHTML = `<h3>Q${i+1}: ${q.question}</h3>`;
+                q.options.forEach(opt => {
+                    const btn = document.createElement('div');
+                    btn.className = 'quiz-option';
+                    btn.textContent = opt;
+                    btn.onclick = () => {
+                        const selected = opt.charAt(0);
+                        if (!btn.classList.contains('selected')) {
+                            // Only allow first click
+                            div.querySelectorAll('.quiz-option').forEach(o => o.style.pointerEvents = 'none');
+                            if (selected === q.answer) {
+                                btn.classList.add('correct');
+                                score++;
+                            } else {
+                                btn.classList.add('wrong');
+                                // Highlight correct
+                                div.querySelectorAll('.quiz-option').forEach(o => {
+                                    if (o.textContent.charAt(0) === q.answer) o.classList.add('correct');
+                                });
+                            }
+                            // Show explanation
+                            const exp = document.createElement('div');
+                            exp.style.cssText = 'margin-top:10px; padding:8px 12px; background:rgba(10,132,255,0.1); border-radius:8px; font-size:13px; color:var(--text2);';
+                            exp.textContent = q.explanation;
+                            div.appendChild(exp);
+                            // Update score display
+                            updateQuizScore(score, total);
+                        }
+                    };
+                    div.appendChild(btn);
+                });
+                content.appendChild(div);
+            });
+
+            const scoreDisplay = document.createElement('div');
+            scoreDisplay.id = 'quizScore';
+            scoreDisplay.style.cssText = 'text-align:center; padding:12px; font-size:15px; font-weight:600; color:var(--text2);';
+            scoreDisplay.textContent = 'Answer questions to see your score';
+            content.appendChild(scoreDisplay);
+        }
+
+        function updateQuizScore(score, total) {
+            const el = document.getElementById('quizScore');
+            if (!el) return;
+            const pct = Math.round((score / total) * 100);
+            if (pct >= 80) {
+                el.innerHTML = `🎉 <span style="color:var(--primary)">${score}/${total}</span> — Excellent!`;
+            } else if (pct >= 50) {
+                el.innerHTML = `👍 <span style="color:var(--accent)">${score}/${total}</span> — Good effort!`;
+            } else {
+                el.innerHTML = `📚 <span style="color:var(--warning)">${score}/${total}</span> — Keep practicing!`;
             }
         }
 
@@ -557,41 +1294,75 @@
             if (!selected.startsWith(correct)) btn.classList.add('wrong');
         }
 
-        function updateProgress() {
-            document.getElementById('statQuestions').textContent = stats.questions;
-            document.getElementById('statQuizzes').textContent = stats.quizzes;
-            document.getElementById('statLevel').textContent = currentDifficulty;
-            document.getElementById('statTopics').textContent = stats.topics.size;
-        }
-
-        // Demo mode responses (when backend is offline)
-        const DEMO_RESPONSES = {
-            'algebra': "Let's work through this step by step!\n\nWe have a linear equation. The goal is to isolate the variable x.\n\nStep 1: Subtract the constant from both sides.\nStep 2: Divide both sides by the coefficient of x.\nStep 3: Check your answer by plugging it back in.\n\nThe key insight is that whatever you do to one side, you must do to the other. This keeps the equation balanced.",
-            'calculus': "Great question! Let me break this down.\n\nThe derivative measures how fast something is changing at any point. Think of it like a speedometer — it tells you your speed (rate of change) at a specific moment.\n\nFor power functions like x^n, the rule is simple:\n• Bring down the exponent: n\n• Reduce the exponent by 1: n-1\n• Result: n * x^(n-1)\n\nThis works for any real number n, not just integers!",
-            'physics': "Let's think about this physically first, then do the math.\n\nNewton's laws are really about one thing: forces cause changes in motion.\n\n1st Law: Things keep doing what they're doing unless something pushes them.\n2nd Law: The harder you push (F), the faster it speeds up (a), but heavier things (m) are harder to push. F = ma.\n3rd Law: Every push has an equal push back.\n\nThe 3rd law is why rockets work — they push gas downward, and the gas pushes the rocket upward.",
-            'chemistry': "Here's the key concept:\n\nA mole is just a counting unit, like 'dozen' means 12.\n\n• 1 dozen eggs = 12 eggs\n• 1 mole of atoms = 6.022 × 10²³ atoms\n\nThe number 6.022 × 10²³ is called Avogadro's number. Why this specific number? Because if you have exactly 6.022 × 10²³ carbon-12 atoms, they weigh exactly 12 grams. That's the definition!\n\nSo: molar mass (g/mol) = mass of 1 mole = mass of 6.022 × 10²³ particles."
+        // ── Progress ──
+        const TOPIC_COLORS = {
+            algebra: '#0a84ff',
+            calculus: '#5e5ce6',
+            physics: '#ff9f0a',
+            chemistry: '#30d158',
+            biology: '#ff375f',
+            geometry: '#64d2ff',
+            cs: '#bf5af2',
+            statistics: '#ffd60a',
+            probability: '#ff6961',
+            linearalgebra: '#32ade6',
+        };
+        const TOPIC_LABELS = {
+            algebra: 'Algebra',
+            calculus: 'Calculus',
+            physics: 'Physics',
+            chemistry: 'Chemistry',
+            biology: 'Biology',
+            geometry: 'Geometry',
+            cs: 'CS',
+            statistics: 'Stats',
+            probability: 'Prob',
+            linearalgebra: 'LinAlg',
         };
 
-        function getDemoResponse(message) {
-            const lower = message.toLowerCase();
-            if (lower.includes('derivative') || lower.includes('integral') || lower.includes('calculus') || lower.includes('integration')) return DEMO_RESPONSES.calculus;
-            if (lower.includes('newton') || lower.includes('force') || lower.includes('velocity') || lower.includes('acceleration')) return DEMO_RESPONSES.physics;
-            if (lower.includes('mole') || lower.includes('bond') || lower.includes('atom') || lower.includes('element') || lower.includes('reaction')) return DEMO_RESPONSES.chemistry;
-            if (lower.includes('solve') || lower.includes('equation') || lower.includes('algebra') || lower.includes('x =')) return DEMO_RESPONSES.algebra;
-            // Generic
-            return "That's a great question! Let me think about this step by step.\n\nIn STEM, we always start by identifying what we know and what we need to find. Then we choose the right tools (formulas, principles) to connect the two.\n\nCould you tell me more about what specific part you'd like help with? I can adjust my explanation to your level.";
+        function updateProgress() {
+            const lvl = getLevel();
+            document.getElementById('xpLevel').textContent = `Level ${lvl.level} — ${lvl.name}`;
+            const xpInLevel = stats.xp - (lvl.level <= 1 ? 0 : [0, 0, 200, 500, 1000, 2000][lvl.level - 1]);
+            const xpNeeded = lvl.next - (lvl.level <= 1 ? 0 : [0, 0, 200, 500, 1000, 2000][lvl.level - 1]);
+            const pct = lvl.next === Infinity ? 100 : Math.min(100, Math.round((xpInLevel / xpNeeded) * 100));
+            document.getElementById('xpFill').style.width = pct + '%';
+            document.getElementById('xpLabel').textContent = lvl.next === Infinity ? `${stats.xp} XP — Max Level!` : `${stats.xp} / ${lvl.next} XP`;
+
+            document.getElementById('statQuestions').textContent = stats.questions;
+            document.getElementById('statQuizzes').textContent = stats.quizzes;
+            document.getElementById('statTopics').textContent = ALL_TOPICS.filter(t => stats.topics[t] > 0).length;
+            document.getElementById('statStreak').textContent = stats.streak;
+
+            // Topic bars
+            const barsEl = document.getElementById('topicBars');
+            barsEl.innerHTML = '';
+            ALL_TOPICS.forEach(t => {
+                const mastery = stats.topicMastery[t] || 0;
+                const row = document.createElement('div');
+                row.className = 'topic-bar-row';
+                row.innerHTML = `
+                    <div class="topic-bar-label">${TOPIC_LABELS[t]}</div>
+                    <div class="topic-bar-track"><div class="topic-bar-fill" style="width:${mastery}%; background:${TOPIC_COLORS[t]}"></div></div>
+                    <div class="topic-bar-pct">${mastery}%</div>
+                `;
+                barsEl.appendChild(row);
+            });
         }
 
-        // Check backend health
-        let backendOnline = false;
+        // ── Health check ──
         async function checkHealth() {
             try {
                 const res = await fetch(`${API_URL}/health`);
                 const data = await res.json();
                 const badge = document.getElementById('statusBadge');
+                const banner = document.getElementById('offlineBanner');
                 if (data.gemma_available) {
                     badge.textContent = 'Online';
                     badge.className = 'status-badge status-online';
+                    banner.className = 'offline-banner online';
+                    banner.querySelector('.banner-text').innerHTML = '<strong>Gemma 4 Connected</strong> — Full AI tutoring active. All features available.';
+                    banner.querySelector('.badge').textContent = 'LIVE';
                     backendOnline = true;
                 } else {
                     badge.textContent = 'Demo';
@@ -605,8 +1376,15 @@
             }
         }
 
+        // ── Init ──
+        renderSuggestions();
         checkHealth();
         setInterval(checkHealth, 30000);
+
+        // Simulate initial progress for demo
+        addXP(35, 'algebra');
+        addXP(20, 'physics');
+        addXP(10, 'calculus');
     </script>
 </body>
 </html>
